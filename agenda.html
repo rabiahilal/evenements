@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Événements</title>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+
+    <!-- Google Fonts: SWEET PEA -->
+    <link href="https://fonts.googleapis.com/css2?family=Sweet+Pea&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #D3D3D3;
+            --secondary-color: #A9A9A9;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --modal-background: #fff;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 80px 20px 20px 20px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        nav .logo {
+            font-family: 'Sweet Pea', cursive;
+            font-size: 2.5em;
+            color: #333;
+            font-weight: bold;
+            margin-right: 30px; 
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        nav .nav-links a:hover {
+            color: #d1d1d1;
+        }
+
+        .button-container {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .month-buttons {
+            display: flex;
+            justify-content: space-around;
+            width: 50%;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        #calendar {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--modal-background);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal.open {
+            display: block;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.open {
+            display: block;
+        }
+
+        .year-container {
+            margin: 20px;
+        }
+
+        .year-container select {
+            padding: 10px;
+            font-size: 1.2em;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: var(--secondary-color);
+        }
+
+        body.dark-mode {
+            --background-color: #333;
+            --text-color: #f4f4f4;
+            --modal-background: #444;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav>
+        <div class="logo">Événements</div>
+        <div class="nav-links">
+            <a href="#" onclick="openNotificationCenter()"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#" onclick="openProfile()"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" onclick="toggleCalendar()"><i class="fas fa-calendar-alt"></i> Calendar</a>
+            <a href="#" onclick="showChallenges()"><i class="fas fa-trophy"></i> Challenges</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="year-container">
+            <label for="yearSelect">Year: </label>
+            <select id="yearSelect" onchange="changeYear()">
+                <option value="2023">2023</option>
+                <option value="2024" selected>2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+            </select>
+        </div>
+
+        <div class="button-container">
+            <button class="nav-button" onclick="prevMonths()">&#8249;</button>
+            <div class="month-buttons" id="monthButtons"></div>
+            <button class="nav-button" onclick="nextMonths()">&#8250;</button>
+        </div>
+
+        <div id="calendar"></div>
+    </main>
+
+    <!-- Challenges Modal -->
+    <div id="challengesModal" class="modal">
+        <h2>Challenges</h2>
+        <div class="button-container">
+            <button onclick="startChallenge('Saving')">Saving Challenge</button>
+            <button onclick="startChallenge('Reading')">Reading Challenge</button>
+            <button onclick="startChallenge('Exercise')">Exercise Challenge</button>
+            <button onclick="addNewChallenge()">Add Challenge</button>
+        </div>
+        <button onclick="closeModal('challengesModal')">Close</button>
+    </div>
+
+    <!-- Notification Center Modal -->
+    <div id="notificationModal" class="modal">
+        <h2>Notification Center</h2>
+        <p>No new notifications.</p>
+        <button onclick="closeModal('notificationModal')">Close</button>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <h2>Your Profile</h2>
+        <p>Profile details go here.</p>
+        <button onclick="closeModal('profileModal')">Close</button>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
+        <h2 id="eventModalTitle">Add Event</h2>
+        <input type="text" id="eventTitle" placeholder="Event Title">
+        <!-- Time input for the specific time of the event -->
+        <label for="eventTime">Time:</label>
+        <input type="time" id="eventTime">
+        <textarea id="eventDescription" placeholder="Event Description"></textarea>
+        <button onclick="saveEvent()">Save Event</button>
+        <button onclick="deleteEvent()" id="deleteEventButton" style="display: none;">Delete Event</button>
+        <button onclick="closeModal('eventModal')">Cancel</button>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+
+    <script>
+        let calendar;
+        let currentGroup = 0;
+        let selectedYear = new Date().getFullYear();
+        let currentEvent = null;
+        let selectedDate = null; // To store the clicked date
+
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        // Load events from localStorage
+        function loadEventsFromStorage() {
+            const storedEvents = localStorage.getItem('calendarEvents');
+            return storedEvents ? JSON.parse(storedEvents) : [];
+        }
+
+        // Save events to localStorage
+        function saveEventsToStorage(events) {
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+        }
+
+        // Initialize the calendar with saved events
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const savedEvents = loadEventsFromStorage();
+            
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                initialDate: new Date(),
+                editable: true,
+                selectable: true,
+                events: savedEvents,  // Load events from localStorage
+                select: function(info) {
+                    selectedDate = info.startStr; // Store the selected date
+                    openEventModal('add', info);
+                },
+                eventClick: function(info) {
+                    openEventModal('edit', info.event);
+                }
+            });
+            calendar.render();
+            displayMonths();
+        });
+
+        function displayMonths() {
+            const monthButtonsDiv = document.getElementById('monthButtons');
+            monthButtonsDiv.innerHTML = '';
+            const start = currentGroup * 4;
+            const end = start + 4;
+            const monthsToShow = months.slice(start, end);
+
+            monthsToShow.forEach((month, index) => {
+                const button = document.createElement('button');
+                button.textContent = month;
+                button.onclick = () => changeMonth(start + index);
+                monthButtonsDiv.appendChild(button);
+            });
+        }
+
+        function changeMonth(monthIndex) {
+            calendar.gotoDate(new Date(selectedYear, monthIndex, 1));
+        }
+
+        function changeYear() {
+            selectedYear = document.getElementById('yearSelect').value;
+            calendar.gotoDate(new Date(selectedYear, 0, 1)); 
+            displayMonths(); 
+        }
+
+        function nextMonths() {
+            if ((currentGroup + 1) * 4 < months.length) {
+                currentGroup++;
+                displayMonths();
+            }
+        }
+
+        function prevMonths() {
+            if (currentGroup > 0) {
+                currentGroup--;
+                displayMonths();
+            }
+        }
+
+        function openEventModal(mode, info) {
+            const modal = document.getElementById('eventModal');
+            const titleInput = document.getElementById('eventTitle');
+            const timeInput = document.getElementById('eventTime'); // Time input
+            const descriptionInput = document.getElementById('eventDescription');
+            const deleteButton = document.getElementById('deleteEventButton');
+
+            if (mode === 'add') {
+                document.getElementById('eventModalTitle').textContent = 'Add Event';
+                titleInput.value = '';
+                timeInput.value = ''; // Reset time input
+                descriptionInput.value = '';
+                deleteButton.style.display = 'none';
+                currentEvent = null;
+            } else {
+                document.getElementById('eventModalTitle').textContent = 'Edit Event';
+                titleInput.value = info.title;
+                timeInput.value = info.start.toISOString().substring(11, 16); // Get time part from event's start date
+                descriptionInput.value = info.extendedProps.description || '';
+                deleteButton.style.display = 'inline-block';
+                currentEvent = info;
+            }
+
+            modal.classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const description = document.getElementById('eventDescription').value;
+            const time = document.getElementById('eventTime').value; // Get time from input
+
+            if (!selectedDate) {
+                alert('Please select a date.');
+                return;
+            }
+
+            let dateTime;
+            let allDayEvent = false;
+
+            // If time is provided, combine date and time
+            if (time) {
+                dateTime = selectedDate + 'T' + time; // Combine date and time
+                allDayEvent = false; // Not an all-day event
+            } else {
+                // If no time is provided, consider it an all-day event
+                dateTime = selectedDate; // Use just the date
+                allDayEvent = true; // All-day event
+            }
+
+            if (currentEvent) {
+                currentEvent.remove(); // Remove the current event if editing
+            }
+
+            // Add event to calendar
+            const newEvent = {
+                title: title,
+                start: dateTime,  // Save the event with the correct date and time
+                allDay: allDayEvent,    // If no time is selected, mark it as an all-day event
+                extendedProps: {
+                    description: description
+                }
+            };
+
+            calendar.addEvent(newEvent);
+
+            // Save the new event to localStorage
+            const savedEvents = loadEventsFromStorage();
+            savedEvents.push(newEvent);
+            saveEventsToStorage(savedEvents);
+
+            closeModal('eventModal'); // Close modal after saving
+        }
+
+        function deleteEvent() {
+            if (currentEvent) {
+                currentEvent.remove();
+            }
+
+            // Update localStorage after deleting the event
+            const savedEvents = loadEventsFromStorage().filter(event => event.title !== currentEvent.title);
+            saveEventsToStorage(savedEvents);
+
+            closeModal('eventModal');
+        }
+
+        function openNotificationCenter() {
+            document.getElementById('notificationModal').classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+        }
+
+        function openProfile() {
+            document.getElementById('profileModal').classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+        }
+
+        function showChallenges() {
+            document.getElementById('challengesModal').classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+        }
+
+        function toggleCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            const yearContainer = document.querySelector('.year-container');
+            if (calendarEl.style.display === 'none') {
+                calendarEl.style.display = 'block';
+                yearContainer.style.display = 'block';
+            } else {
+                calendarEl.style.display = 'none';
+                yearContainer.style.display = 'none';
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const darkModeToggle = document.querySelector('.dark-mode-toggle i');
+            if (document.body.classList.contains('dark-mode')) {
+                darkModeToggle.classList.remove('fa-moon');
+                darkModeToggle.classList.add('fa-sun');
+            } else {
+                darkModeToggle.classList.remove('fa-sun');
+                darkModeToggle.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
+</html>
