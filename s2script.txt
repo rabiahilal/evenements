@@ -1,0 +1,285 @@
+// Basic variables for calendar, challenges, and savings, notification 
+let calendar;
+let selectedYear = new Date().getFullYear();
+let currentEvent = null;
+let selectedDate = null;
+let totalSavings = 0;
+let totalBooksRead = 0; // Added for reading challenge
+let currentGroup = 0; // Variable to control the current group of months
+let unreadNotifications = 0; // Counter for unread notifications
+let notificationBell = document.getElementById('notificationBell'); // The notification bell element
+
+// Initialize the calendar when the page loads
+document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+    const savedEvents = loadEventsFromStorage();
+
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        editable: true,
+        selectable: true,
+        events: savedEvents,
+        select: function (info) {
+            selectedDate = info.startStr;
+            openEventModal('add');
+        },
+        eventClick: function (info) {
+            openEventModal('edit', info.event);
+        }
+    });
+    calendar.render();
+    displayMonths();
+});
+
+// Load events from local storage
+function loadEventsFromStorage() {
+    const storedEvents = localStorage.getItem('calendarEvents');
+    return storedEvents ? JSON.parse(storedEvents) : [];
+}
+
+// Save events to local storage
+function saveEventsToStorage(events) {
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+}
+
+// Open the modal for adding or editing an event
+function openEventModal(mode, event = null) {
+    const modal = document.getElementById('eventModal');
+    const titleInput = document.getElementById('eventTitle');
+    const timeInput = document.getElementById('eventTime');
+    const descriptionInput = document.getElementById('eventDescription');
+    const deleteButton = document.getElementById('deleteEventButton');
+
+    if (mode === 'add') {
+        document.getElementById('eventModalTitle').textContent = 'Add Event';
+        titleInput.value = '';
+        timeInput.value = '';
+        descriptionInput.value = '';
+        deleteButton.style.display = 'none';
+        currentEvent = null;
+    } else {
+        document.getElementById('eventModalTitle').textContent = 'Edit Event';
+        titleInput.value = event.title;
+        timeInput.value = event.start.toISOString().substring(11, 16);
+        descriptionInput.value = event.extendedProps.description || '';
+        deleteButton.style.display = 'inline-block';
+        currentEvent = event;
+    }
+
+    modal.classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+}
+
+// Save the event to the calendar
+function saveEvent() {
+    const title = document.getElementById('eventTitle').value;
+    const description = document.getElementById('eventDescription').value;
+    const time = document.getElementById('eventTime').value;
+
+    if (!selectedDate) {
+        alert('Please select a date.');
+        return;
+    }
+
+    const dateTime = time ? `${selectedDate}T${time}` : selectedDate;
+    const newEvent = {
+        title,
+        start: dateTime,
+        allDay: !time,
+        extendedProps: { description }
+    };
+
+    if (currentEvent) {
+        currentEvent.remove(); // Remove the existing event if editing
+    }
+
+    calendar.addEvent(newEvent);
+    const savedEvents = loadEventsFromStorage();
+    savedEvents.push(newEvent);
+    saveEventsToStorage(savedEvents);
+
+    // Add notification
+    addNotification(`Event "${title}" added to the calendar!`);
+    notificationBell.classList.add('red'); // Change bell color to red when a new event is added
+    closeModal('eventModal');
+}
+
+// Delete the event from the calendar
+function deleteEvent() {
+    if (currentEvent) {
+        addNotification(`Event "${currentEvent.title}" deleted.`);
+        currentEvent.remove();
+        const savedEvents = loadEventsFromStorage().filter(event => event.title !== currentEvent.title);
+        saveEventsToStorage(savedEvents);
+        closeModal('eventModal');
+    }
+}
+
+// Display month buttons
+function displayMonths() {
+    const monthButtonsDiv = document.getElementById('monthButtons');
+    monthButtonsDiv.innerHTML = '';
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const start = currentGroup * 4;
+    const end = Math.min(start + 4, months.length);
+
+    months.slice(start, end).forEach((month, index) => {
+        const button = document.createElement('button');
+        button.textContent = month;
+        button.onclick = () => changeMonth(start + index);
+        monthButtonsDiv.appendChild(button);
+    });
+}
+
+// Change the displayed month
+function changeMonth(monthIndex) {
+    calendar.gotoDate(new Date(selectedYear, monthIndex, 1));
+    addNotification(`Changed to ${monthIndex + 1}`);
+}
+
+// Change the selected year
+function changeYear() {
+    selectedYear = parseInt(document.getElementById('yearSelect').value);
+    calendar.gotoDate(new Date(selectedYear, 0, 1));
+    addNotification(`Year changed to ${selectedYear}`);
+    displayMonths();
+}
+
+// Go to the next set of months
+function nextMonths() {
+    if ((currentGroup + 1) * 4 < 12) {
+        currentGroup++;
+        displayMonths();
+    }
+}
+
+// Go to the previous set of months
+function prevMonths() {
+    if (currentGroup > 0) {
+        currentGroup--;
+        displayMonths();
+    }
+}
+
+// Close the modal
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+}
+
+// Notification System Functions
+
+// Open notification center
+function openNotificationCenter() {
+    const notificationCenter = document.getElementById('notificationCenter');
+    notificationCenter.style.display = 'block';
+    unreadNotifications = 0;
+    updateNotificationBadge();
+
+    document.getElementById('notificationBell').classList.remove('red'); // Reset bell color
+}
+
+// Close notification center
+function closeNotificationCenter() {
+    const notificationCenter = document.getElementById('notificationCenter');
+    notificationCenter.style.display = 'none';
+}
+
+// Add a new notification
+function addNotification(message) {
+    const notificationList = document.getElementById('notificationList');
+    const notificationItem = document.createElement('li');
+    notificationItem.textContent = message;
+    notificationList.appendChild(notificationItem);
+
+    unreadNotifications++;
+    updateNotificationBadge();
+
+    // Change bell color to red
+    document.getElementById('notificationBell').classList.add('red');
+}
+
+// Update the notification badge
+function updateNotificationBadge() {
+    const badge = document.getElementById('notificationBadge');
+    badge.textContent = unreadNotifications;
+    badge.style.display = unreadNotifications > 0 ? 'block' : 'none';
+}
+
+// Open the saving challenge modal
+function openSavingChallenge() {
+    document.getElementById('savingChallengeModal').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+    updateSavingProgress();
+}
+
+// Add money to savings
+function addMoney() {
+    const amount = parseFloat(document.getElementById('moneyInput').value);
+    if (amount > 0) {
+        totalSavings += amount;
+        document.getElementById('totalSavings').textContent = totalSavings.toFixed(2);
+        updateSavingProgress();
+
+        const coinIcon = document.createElement('div');
+        coinIcon.classList.add('coin-animation');
+        coinIcon.innerHTML = `<i class="fas fa-coins"></i> $${amount.toFixed(2)}`;
+        document.getElementById('coinAnimationContainer').appendChild(coinIcon);
+
+        setTimeout(() => {
+            coinIcon.style.bottom = '100px';
+            coinIcon.style.opacity = '0';
+        }, 100);
+
+        setTimeout(() => {
+            coinIcon.remove();
+        }, 1100);
+
+        document.getElementById('moneyInput').value = '';
+    }
+}
+
+// Update the saving progress
+function updateSavingProgress() {
+    const savingsGoal = parseFloat(document.getElementById('savingsGoal').value) || 0;
+    const progress = savingsGoal > 0 ? Math.min((totalSavings / savingsGoal) * 100, 100) : 0;
+    document.getElementById('savingProgress').style.width = `${progress}%`;
+}
+
+// Show the challenges modal
+function showChallenges() {
+    document.getElementById('challengesModal').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+}
+
+// Start a specific challenge
+function startChallenge(type) {
+    alert(`${type} challenge started!`);
+}
+
+// Open the profile page
+function openProfile() {
+    alert('Profile details go here.');
+}
+
+// Open the reading challenge modal
+function openReadingChallenge() {
+    document.getElementById('readingChallengeModal').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+}
+
+// Mark a book as read
+function addBookRead() {
+    totalBooksRead++;
+    document.getElementById('totalBooksRead').textContent = totalBooksRead;
+    document.getElementById('bookReadInput').value = '';
+}

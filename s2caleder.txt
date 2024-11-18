@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Événements</title>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+
+    <!-- Google Fonts: SWEET PEA -->
+    <link href="https://fonts.googleapis.com/css2?family=Sweet+Pea&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">Événements</div>
+        <div class="nav-links">
+            <!-- Notification Icon with Badge -->
+            <a href="#" onclick="openNotificationCenter()">
+                <i id="notificationBell" class="fas fa-bell"></i>
+                <span id="notificationBadge" class="badge">0</span>
+            </a>
+            <a href="#" onclick="openProfile()"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" onclick="toggleCalendar()"><i class="fas fa-calendar-alt"></i> Calendar</a>
+            <a href="#" onclick="showChallenges()"><i class="fas fa-trophy"></i> Challenges</a>
+        </div>
+    </nav>
+    <!-- Notification Center -->
+    <div id="notificationCenter" class="notification-center" style="display: none;">
+        <h3>Notifications</h3>
+        <ul id="notificationList"></ul>
+        <button onclick="closeNotificationCenter()">Close</button>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Year Selector -->
+        <div class="year-container">
+            <label for="yearSelect">Year: </label>
+            <select id="yearSelect" onchange="changeYear()">
+                <option value="2023">2023</option>
+                <option value="2024" selected>2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+            </select>
+        </div>
+
+        <!-- Month Navigation Buttons -->
+        <div class="button-container">
+            <button class="nav-button" onclick="prevMonths()">&#8249;</button>
+            <div class="month-buttons" id="monthButtons"></div>
+            <button class="nav-button" onclick="nextMonths()">&#8250;</button>
+        </div>
+
+        <!-- Calendar Display -->
+        <div id="calendar"></div>
+    </main>
+
+    <!-- Event Modal for Adding/Editing Events -->
+    <div id="eventModal" class="modal">
+        <h2 id="eventModalTitle">Add Event</h2>
+        <input type="text" id="eventTitle" placeholder="Event Title">
+        <label for="eventTime">Time:</label>
+        <input type="time" id="eventTime">
+        <textarea id="eventDescription" placeholder="Event Description"></textarea>
+        <button onclick="saveEvent()">Save Event</button>
+        <button onclick="deleteEvent()" id="deleteEventButton" style="display: none;">Delete Event</button>
+        <button onclick="closeModal('eventModal')">Cancel</button>
+    </div>
+
+    <!-- Challenges Modal -->
+    <div id="challengesModal" class="modal">
+        <h2>Challenges</h2>
+        <div class="button-container">
+            <button onclick="openSavingChallenge()">Saving Challenge</button>
+            <button onclick="startChallenge('Reading')">Reading Challenge</button>
+            <button onclick="startChallenge('Exercise')">Exercise Challenge</button>
+        </div>
+        <button onclick="closeModal('challengesModal')">Close</button>
+    </div>
+
+    <!-- Saving Challenge Modal -->
+    <div id="savingChallengeModal" class="modal">
+        <h2>Saving Challenge</h2>
+        <div class="piggy-bank-container">
+            <div class="piggy-bank-header">
+                <p>Goal: $</p>
+                <input type="number" id="savingsGoal" class="saving-goal-input" placeholder="500" min="1" value="500" oninput="updateSavingProgress()">
+            </div>
+            <div class="saving-progress-container" style="width: 100%; background: #c0c0c0; border-radius: 10px;">
+                <div id="savingProgress" class="saving-progress" style="width: 0%;"></div>
+            </div>
+            <p>Total Saved: $<span id="totalSavings">0</span></p>
+            <div class="input-section">
+                <input type="number" id="moneyInput" placeholder="Amount to add" min="1" style="width: 100px; padding: 8px;">
+            </div>
+            <div class="button-section">
+                <button onclick="addMoney()">Add Money</button>
+                <button onclick="closeModal('savingChallengeModal')">Close</button>
+            </div>
+            <div id="coinAnimationContainer"></div>
+        </div>
+    </div>
+
+    <!-- Overlay for Modals -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
