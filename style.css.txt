@@ -1,0 +1,416 @@
+/* Root Variables for Colors and Theme */
+:root {
+    --primary-color: #D3D3D3;
+    --secondary-color: #A9A9A9;
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --modal-background: #fff;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 80px 20px 20px 20px;
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Navigation Bar Styling */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Styling for the notification bell in the navigation bar */
+#notificationBell {
+    color: gray; /* Default bell color */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 24px; /* Size of the bell icon */
+    position: relative; /* To position the badge correctly */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+#notificationBell.red {
+    color: red; /* Change to red when there are notifications */
+}
+
+#notificationBadge {
+    position: absolute;
+    top: -5px; /* Position the badge above the bell */
+    right: -10px; /* Align the badge to the right */
+    background-color: red; /* Badge background color */
+    color: white; /* Text color inside the badge */
+    border-radius: 50%; /* Make the badge circular */
+    padding: 2px 5px; /* Padding for the badge */
+    font-size: 0.8rem; /* Font size for the badge text */
+    display: none; /* Initially hide the badge */
+}
+
+nav .logo {
+    font-family: 'Sweet Pea', cursive;
+    font-size: 2.5em;
+    color: #333;
+    font-weight: bold;
+    margin-right: 30px; 
+}
+
+nav .nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+nav .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s;
+}
+
+nav .nav-links a:hover {
+    color: #d1d1d1;
+}
+
+/* Badge for Notifications */
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    display: none; /* Hidden by default */
+}
+
+/* Notification Center Styling */
+.notification-center {
+    position: fixed;
+    top: 15%;
+    right: 20px;
+    width: 300px;
+    background-color: var(--modal-background);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 1000;
+    display: none; /* Hidden by default */
+}
+
+.notification-center h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: left;
+}
+
+.notification-center ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.notification-center ul li {
+    background-color: var(--background-color);
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.notification-center button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.notification-center button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Hidden Utility Class */
+.hidden {
+    display: none;
+}
+
+/* Calendar Section Styling */
+.button-container {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.month-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 50%;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--secondary-color);
+}
+
+#calendar {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--modal-background);
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal.open {
+    display: block;
+}
+
+/* Overlay Styling */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.overlay.open {
+    display: block;
+}
+
+/* Year Selector Styling */
+.year-container {
+    margin: 20px;
+}
+
+.year-container select {
+    padding: 10px;
+    font-size: 1.2em;
+}
+
+/* Saving Challenge Styling */
+.piggy-bank-container {
+    position: relative;
+    background-color: #e0e0e0;
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    overflow: hidden;
+}
+
+.piggy-bank-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saving-goal-input {
+    width: 60px;
+    padding: 5px;
+    font-size: 1em;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin: 0 5px;
+}
+
+.saving-progress-container {
+    width: 100%;
+    background-color: #c0c0c0;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.saving-progress {
+    background-color: #4caf50;
+    height: 20px;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.coin-animation {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    opacity: 1;
+    transition: all 1s ease-in;
+}
+
+.input-section, .button-section {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Style for the introduction text in the Reading Challenge modal */
+#readingIntro {
+    font-size: 16px; /* Adjust the font size */
+    color: #555; /* Text color */
+    text-align: center; /* Center-align the text */
+    margin-bottom: 20px; /* Add spacing below the text */
+    line-height: 1.5; /* Increase line spacing for readability */
+}
+ /*EXERCISE*/
+ #exerciseChallengeModal {
+    text-align: left;
+}
+
+#exerciseChallengeList {
+    list-style: none;
+    padding: 0;
+}
+
+#exerciseChallengeList li {
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.quote-container {
+    font-size: 1.2em;
+    font-style: italic;
+    color: var(--secondary-color);
+    margin: 20px auto;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    background-color: var(--background-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+    .profile-container {
+        width: 300px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+    .profile-container h2 {
+        margin-bottom: 20px;
+    }
+    .profile-container p {
+        font-size: 16px;
+        margin: 10px 0;
+    }
+    .profile-container button {
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .profile-container button:hover {
+        background-color: #555;
+    }
+@font-face {
+    font-family: 'Sweet Pea';
+    src: url('fonts/SweetPea.ttf') format('truetype');
+}
+
+body {
+    font-family: 'Sweet Pea', Arial, sans-serif;
+}
+/* Default (Light Mode) */
+body {
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --primary-color: #D3D3D3;
+    --secondary-color: #A9A9A9;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+/* Dark Mode */
+body[data-theme='dark'] {
+    --background-color: #121212;
+    --text-color: #f5f5f5;
+    --primary-color: #333333;
+    --secondary-color: #555555;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+.theme-switcher {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    z-index: 1000;
+}
+
+.theme-switcher:hover {
+    transform: scale(1.1);
+}
+
+.theme-switcher i {
+    font-size: 28px;
+    transition: transform 0.3s;
+}

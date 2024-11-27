@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyAgenda - Login & Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Sweet+Pea&display=swap" rel="stylesheet">
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 300px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .toggle-link {
+            color: #333;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login and Signup Container -->
+    <div id="login-container" class="container">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email" />
+        <input type="password" id="login-password" placeholder="Password" />
+        <div class="error" id="login-error"></div>
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <span class="toggle-link" onclick="toggleForm('signup')">Sign up</span></p>
+    </div>
+
+    <div id="signup-container" class="container" style="display: none;">
+        <h2>Sign Up</h2>
+        <input type="text" id="signup-fullname" placeholder="Full Name" />
+        <input type="email" id="signup-email" placeholder="Email" />
+        <input type="email" id="signup-confirm-email" placeholder="Confirm Email" />
+        <input type="password" id="signup-password" placeholder="Password" />
+        <input type="password" id="signup-confirm-password" placeholder="Confirm Password" />
+        <div class="error" id="signup-error"></div>
+        <button onclick="signup()">Sign Up</button>
+        <p>Already have an account? <span class="toggle-link" onclick="toggleForm('login')">Log in</span></p>
+    </div>
+
+    <script>
+        function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const loginError = document.getElementById('login-error');
+    
+            // Simple validation
+            if (email === '' || password === '') {
+                loginError.textContent = 'Please fill in all fields.';
+                return;
+            }
+    
+            // Redirect to the calendar page
+            window.location.href = 'calender.html'; // Ensure calendar.html is in the same directory
+        }
+
+    
+        function signup() {
+            const fullName = document.getElementById('signup-fullname').value;
+            const email = document.getElementById('signup-email').value;
+            const confirmEmail = document.getElementById('signup-confirm-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const signupError = document.getElementById('signup-error');
+    
+            // Basic validation for signup fields
+            if (fullName === '' || email === '' || confirmEmail === '' || password === '' || confirmPassword === '') {
+                signupError.textContent = 'Please fill in all fields.';
+                return;
+            }
+    
+            if (email !== confirmEmail) {
+                signupError.textContent = 'Emails do not match.';
+                return;
+            }
+    
+            if (password !== confirmPassword) {
+                signupError.textContent = 'Passwords do not match.';
+                return;
+            }
+    
+            // Clear the error message if everything is valid
+            signupError.textContent = '';
+
+            // Save user data to localStorage or sessionStorage (optional)
+            localStorage.setItem('user', JSON.stringify({ fullName, email }));
+
+            // Redirect to the login form after successful signup
+            toggleForm('login'); // Show login form
+        }
+    
+        function toggleForm(form) {
+            const loginContainer = document.getElementById('login-container');
+            const signupContainer = document.getElementById('signup-container');
+            if (form === 'signup') {
+                loginContainer.style.display = 'none';
+                signupContainer.style.display = 'block';
+            } else {
+                loginContainer.style.display = 'block';
+                signupContainer.style.display = 'none';
+            }
+        }
+    </script>
+
+    <script>
+    // Sign-up function with database interaction simulation
+    async function signup() {
+        const fullname = document.getElementById("signup-fullname").value;
+        const email = document.getElementById("signup-email").value;
+        const confirmEmail = document.getElementById("signup-confirm-email").value;
+        const password = document.getElementById("signup-password").value;
+        const confirmPassword = document.getElementById("signup-confirm-password").value;
+
+        try {
+            const response = await fetch('http://localhost:51014/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fullname,
+                    email,
+                    confirmEmail,
+                    password,
+                    confirmPassword
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message); // Show success message
+                toggleForm('login'); // Switch to login form
+            } else {
+                document.getElementById("signup-error").textContent = data.message;
+            }
+        } catch (error) {
+            document.getElementById("signup-error").textContent = "An error occurred during sign-up.";
+        }
+    }
+
+    // Login function with database interaction simulation
+    async function login() {
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+
+        try {
+            const response = await fetch('http://localhost:51014/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message); // Show success message
+                window.location.href = 'CALENDER.html'; // Show the calendar if login is successful
+            } else {
+                document.getElementById("login-error").textContent = data.message;
+            }
+        } catch (error) {
+            document.getElementById("login-error").textContent = "An error occurred during login.";
+        }
+    }
+</script>
+
+</body>
+</html>
